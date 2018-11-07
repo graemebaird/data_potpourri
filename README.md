@@ -16,7 +16,7 @@ Implemented:
 - Variable importance plotting
 
 
-### 2. Machine vision for leaf detection - `leaf_area_machinevision`
+### 2. Machine vision for leaf detection - `/leaf_area_machinevision`
 
 Written in Python / Jupyter. Image data collected by my Agroecology students at UC Santa Cruz using a basic point-and-shoot and handheld frame. A variety of methods for machine vision quantification of percent leaf cover from easily-obtained RGB images. 
 
@@ -27,7 +27,7 @@ Implemented:
 - Edge detection for image segementation (*code pending*)
 
 
-### 3. Lygus bug and strawberry damage - `strawberry_damage_missing`
+### 3. Lygus bug and strawberry damage - `/strawberry_damage_missing`
 
 Written in R and Stan. Strawberry data collected by Diego Nieto as part of the UCSC-OREI project. Implements a Bayesian hierarchical mixture model to estimate both fruit damage (proportion damage in a sample) and flower damage (# missing fruit from observed sample). 
 
