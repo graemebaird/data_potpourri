@@ -24,7 +24,7 @@ Implemented:
 - 3D plotting of colorspace samples, code for producing rotating 3D projections
 - KNN-based segmentation of colorspace into leaf/not-leaf spaces
 - 2D embedding of colorspace segmentations (t-SNE, UMAP, TriMap, PCA)
-- Edge detection for image segementation (*code pending*)
+- Edge detection for image segmentation (*code pending*)
 
 
 ### 3. Lygus bug and strawberry damage - `/strawberry_damage_missing`
