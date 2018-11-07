@@ -1,4 +1,5 @@
-# data_potpourri
+# Data Potpourri
+
 A catalog of data science / machine learning methods and applications
 
 
@@ -6,10 +7,21 @@ A catalog of data science / machine learning methods and applications
 
 1. Breast Cancer Wisconsin - `/breastcancer_uci`
 
-A common binary classification machine learning dataset. Estimate whether tumors are malignant or benign. 
+Written in R. A common binary classification machine learning dataset. Estimate whether tumors are malignant or benign. 
 
-Implements:
+Implemented:
 - Conditional random forest for prediction
 - Calibrated using FP/FN thresholding to optimize specificity (using `caret`)
 - Confusion matrix plotting
 - Variable importance plotting
+
+
+2. Machine vision for leaf detection - `leaf_area_machinevision`
+
+Written in Python / Jupyter. Image data collected by my Agroecology students at UC Santa Cruz using a basic point-and-shoot and handheld frame. A variety of methods for machine vision quantification of percent leaf cover from easily-obtained RGB images. 
+
+Implemented:
+- 3D plotting of colorspace samples, code for producing rotating 3D projections
+- KNN-based segmentation of colorspace into leaf/not-leaf spaces
+- 2D embedding of colorspace segmentations (t-SNE, UMAP, TriMap, PCA)
+- Edge detection for image segementation (code pending)
