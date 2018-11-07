@@ -1,6 +1,6 @@
 # Data Potpourri
 
-A catalog of data science / machine learning methods and applications
+A catalog of data science / machine learning methods and applications (*unfinished, currently transfering / organizing from private repositories*)
 
 
 ## Catalog index
