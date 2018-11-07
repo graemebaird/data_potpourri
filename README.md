@@ -41,7 +41,7 @@ Written in R and Stan.
 
 Data: Strawberry damage observations collected by Diego Nieto's team as part of the UCSC-OREI project. 
 
-Objective: Estimate both fruit damage (proportion damage in a sample) and flower damage (# missing fruit from observed sample). 
+Objective: Estimate both fruit damage (proportion damage in a sample) and flower damage (# missing fruit from observed sample) as functions of experimental treatments and environmental covariates. 
 
 Implemented: 
 - Bayesian hierarchical mixture model regression for experimental inference
