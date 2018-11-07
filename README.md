@@ -7,7 +7,7 @@ A catalog of data science / machine learning methods and applications (*unfinish
 
 ### 1. Breast Cancer Wisconsin - `/breastcancer_uci`
 
-Written in R. A common binary classification machine learning dataset. Estimate whether tumors are malignant or benign. 
+Written in R / RMarkdown. A common binary classification machine learning dataset. Estimate whether tumors are malignant or benign. 
 
 Implemented:
 - Conditional random forest for prediction
