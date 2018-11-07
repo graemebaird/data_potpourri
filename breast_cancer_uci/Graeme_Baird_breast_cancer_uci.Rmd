@@ -1,0 +1,252 @@
+---
+title: "Data exploration: Breast Cancer Washington UCI"
+author: "Graeme Baird"
+date: "10/12/2018"
+output: 
+  html_document:
+    highlight: tango
+    toc: true
+    toc_float:
+        collapsed: false
+    header-includes:
+     - \usepackage{amsmath}
+     
+---
+
+```{r setup, include=FALSE, echo=FALSE,results='hide',fig.keep='all'}
+
+library(tidyverse)
+library(magrittr)
+library(party)
+library(caret)
+library(GGally)
+library(randomForest)
+library(reshape)
+library(dlookr)
+library(knitr)
+opts_chunk$set(message=FALSE)
+source("f_thresh_code_caret.R")
+source("f_confusion_matrix_code_so.R")
+
+
+# Thanks for this function, https://favorableoutcomes.wordpress.com/2014/12/19/r-function-for-plotting-variable-importance-results-from-cforest-imlementation-of-random-forest-model/
+
+cforestImpPlot = function(x) {
+  cforest_importance <<- v <- varimp(x)
+  dotchart(v[order(v)])
+}
+
+
+```
+
+# Introduction
+
+This dataset is taken from `https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Original)`
+
+The data describes cell characteristics from biopsies of breast tumor tissue. The primary class outcome from this data is the tumor class (Benign or Malignant). Samples were periodically collected from 1989 through 1991, but are considered independent identically distributed in the dataset and in this analysis. 
+
+# Intake and data cleaning
+
+The dataset is relatively clean, with very little missing data. There are some duplicate samples. 16 samples are missing from the "Bland chromatin" parameter. For this analysis, samples with missing data are excluded (2% of the data).
+
+The parameters kept are (as taken from `data/breast-cancer-wisconsin.names.txt`):
+
+ 1. Clump Thickness               1 - 10
+ 2. Uniformity of Cell Size       1 - 10
+ 3. Uniformity of Cell Shape      1 - 10
+ 4. Marginal Adhesion             1 - 10
+ 5. Single Epithelial Cell Size   1 - 10
+ 6. Bare Nuclei                   1 - 10
+ 7. Bland Chromatin               1 - 10
+ 8. Normal Nucleoli               1 - 10
+ 9. Mitoses                       1 - 10
+10. Class:                        (2 for benign, 4 for malignant)
+
+
+```{r, results="hide"}
+
+d = read_csv("data/breast-cancer-wisconsin.data.txt", col_names = FALSE)
+
+d %<>% 
+  filter(X7 != "?") %>% 
+  mutate(X7 = as.integer(X7), 
+         X11 = ifelse(X11 == "2", "benign", "malign") %>% 
+                  as.factor() %>% 
+                  relevel(ref="malign")) %>%
+  select(-X1)
+
+colnames(d) = c("clump", "cell_size_unif", "cell_shape", "marg_adh", "single_ep_size", 
+                "bare_nuc", "bland_chrom", "normal_nuc", "mitoses", "class")
+```
+
+
+# Data exploration
+
+## Summary statistics
+The features are all integer classed, and the outcome is a factor (malignant vs benign). Their ranges are relatively similar, with relatively large variances and relatively large skewnesses. 
+
+```{r}
+describe(d) %>% 
+  select(variable, n, na, mean, sd, skewness, p50) %>% 
+  print(n=15) %>%
+  kable()
+
+```
+
+The outcome classes are relatively imbalanced, with a roughly 1:2 ratio of malignant tumors to benign tumors. This imbalance will need to be accounted for in the classification model fits. 
+
+```{r, results="hide"}
+d %$% table(class) %>% kable
+```
+
+## Pairs plotting
+Moderate levels of correlation between the parameters are present, indicating some collinearity - this will need to be accounted for in the model design as well. At first glance in these pairs plots, there are visible direct relationships between features and the outcome, and some strong differences in both location and scale in the prediction features when segregated by outcome class. 
+
+### Pairs 1
+
+ 1. Clump Thickness               1 - 10
+ 2. Uniformity of Cell Size       1 - 10
+ 3. Uniformity of Cell Shape      1 - 10
+ 
+```{r, results="hide", fig.width = 7, fig.height=5}
+
+ggpairs(d, 
+        mapping = ggplot2::aes(color=class), 
+        columns = c(1:3,10), 
+        lower = list(continuous = wrap("points", alpha = 0.3, position = "jitter")))
+
+```
+
+### Pairs 2
+
+ 4. Marginal Adhesion             1 - 10
+ 5. Single Epithelial Cell Size   1 - 10
+ 6. Bare Nuclei                   1 - 10
+ 
+```{r, results="hide", fig.width = 7, fig.height=5}
+ggpairs(d, 
+        mapping = ggplot2::aes(color=class), 
+        columns = c(4:6,10), 
+        lower = list(continuous = wrap("points", alpha = 0.3, position = "jitter")))
+
+```
+
+### Pairs 3
+
+ 7. Bland Chromatin               1 - 10
+ 8. Normal Nucleoli               1 - 10
+ 9. Mitoses                       1 - 10
+ 
+```{r, results="hide", fig.width = 7, fig.height=5}
+
+ggpairs(d, 
+        mapping = ggplot2::aes(color=class), 
+        columns = c(7:9,10), 
+        lower = list(continuous = wrap("points", alpha = 0.3, position = "jitter")))
+
+```
+
+## Point-range plotting against outcome
+We can re-plot these data as point-ranges to further visualize the class separation: 
+```{r, results="hide"}
+d %>%
+  reshape2::melt() %>%
+  group_by(class,variable) %>%
+  dplyr::summarise(mean = mean(value), sem = sd(value)) %>%
+  ggplot(aes(x = variable, y = mean, ymin = mean - sem, ymax = mean + sem, color=class)) + 
+  geom_pointrange() + 
+  coord_flip() + 
+  xlab("Predictor") + 
+  ylab("Mean value")
+```
+
+
+# Model train
+
+## Model description
+A flexible out-of-the-box classifier capable of handling moderate collinearity is the Random Forest classifier. 
+
+Important to this classification problem is the difference between sensitivity and specificity. While both are important features of model fit, we want to be sure to explore the model tuning in order to maximize specificity and to minimize the chance of missing a positive hit (i.e. leaving a patient with a malignant tumor). 
+
+## Training parameters
+- Cross-validation split: 70%
+- Number of cross-validation steps: 5
+- Number of trees: 2000
+- Sampling: downsampling
+- Number of tree splitting values tested: 20
+
+## Model code
+```{r, results="hide"}
+# Train model with caret::train
+mod = train(class ~ ., 
+             data = d, 
+             method = thresh_code, 
+             metric = "Dist", 
+             tuneLength = 20,
+             ntree= 2000,
+             trControl = trainControl(method = "LGOCV", 
+                                      p = 0.7, 
+                                      number = 5,
+                                      savePredictions = T,
+                                      classProbs = TRUE,
+                                      summaryFunction = fourStats,
+                                      sampling="down"))
+```
+
+# Model output
+
+## Sensitivity/specificity search
+
+A "perfect" classification model would have specificity AND sensitivity of 1, so in addition to the plotted sensitivity/specificity values, the visualization below includes a theoretical distance from that "perfect" model. (note: it may be the case that we would prefer to maximize specificity for reasons mentioned above, and the ideal model would have a lower goal for sensitivity - these would require some arbitrary cutoffs). 
+
+```{r, results="hide"}
+metrics = mod$results[, c(2, 4:6)] # Extract model features
+metrics = melt(metrics, id.vars = "threshold", 
+                variable.name = "Resampled",
+                value.name = "Data") # Reshape
+
+ggplot(metrics, aes(x = threshold, y = value, color = variable)) + 
+  geom_line() + 
+  ylab("") + 
+  xlab("Probability Cutoff") +
+  theme_bw()
+```
+
+We can see that varying the parameter produces noticeable changes in the model behavior, and the best-fit models are observed around a cutoff value of ~.40. 
+
+## Confusion matrix
+
+A confusion matrix can be constructed from the above best-fit model to demonstrate the model's predictive capacity. The model misclassifies only a small proportion of the observed tumors, and false-negatives are kept relatively low. If a domain expert preferred an even lower false-negative rate, we could easily return to the hyperparameter tuning phase and seek out improved performance in this metric. 
+
+```{r, results="hide"}
+
+cf_fit = cforest(class ~ ., data = d) # Refit a cforest (finds the same fit as the gridsearch)
+
+cmat = confusionMatrix(data = predict(cf_fit), reference = d$class) # Generate confusion matrix
+
+draw_confusion_matrix(cmat) # Draw confusion matrix
+
+```
+
+## Variable importance scoring
+
+It may also be helpful to examine which features were most frequently included in the forest model as critical for prediction. In the plot below, the prediction features are listed in descending order. In cases of future data replication, this plot suggests that these features or biologically similar features may be important to focus on for data collection and curation efforts. 
+
+Human-readable variables repeated for clarity of comparision to the visualization:
+
+ 1. Clump Thickness               1 - 10
+ 2. Uniformity of Cell Size       1 - 10
+ 3. Uniformity of Cell Shape      1 - 10
+ 4. Marginal Adhesion             1 - 10
+ 5. Single Epithelial Cell Size   1 - 10
+ 6. Bare Nuclei                   1 - 10
+ 7. Bland Chromatin               1 - 10
+ 8. Normal Nucleoli               1 - 10
+ 9. Mitoses                       1 - 10
+10. Class:                        (2 for benign, 4 for malignant)
+
+
+```{r, results="hide"}
+cforestImpPlot(cf_fit)
+```
+
