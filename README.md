@@ -24,4 +24,14 @@ Implemented:
 - 3D plotting of colorspace samples, code for producing rotating 3D projections
 - KNN-based segmentation of colorspace into leaf/not-leaf spaces
 - 2D embedding of colorspace segmentations (t-SNE, UMAP, TriMap, PCA)
-- Edge detection for image segementation (code pending)
+- Edge detection for image segementation (*code pending*)
+
+
+3. Lygus bug and strawberry damage - `strawberry_damage_missing`
+
+Written in R and Stan. Strawberry data collected by Diego Nieto as part of the UCSC-OREI project. Implements a Bayesian hierarchical mixture model to estimate both fruit damage (proportion damage in a sample) and flower damage (# missing fruit from observed sample). 
+
+Implemented: 
+- Hierarchical mixture model regression for experimental inference
+- Workaround for log-probability updates to simulate integer values in the Stan framework (which otherwise uses an MCM sampler that doesn't support integer parameters). 
+
