@@ -45,5 +45,5 @@ Objective: Estimate both fruit damage (proportion damage in a sample) and flower
 
 Implemented: 
 - Bayesian hierarchical mixture model regression for experimental inference
-- Workaround for log-probability updates to simulate integer values in the Stan framework (which otherwise uses an MCM sampler that doesn't support integer parameters). 
+- Workaround for log-probability updates to simulate integer values in the Stan framework (which otherwise uses an MCMC sampler that doesn't support integer parameters). 
 
