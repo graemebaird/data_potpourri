@@ -5,7 +5,7 @@ A catalog of data science / machine learning methods and applications (*unfinish
 
 ## Catalog index
 
-### 1. Breast Cancer Wisconsin - `/breastcancer_uci`
+### 1. Detecting malignant tumors by cell features - `/breastcancer_uci`
 
 Written in R / RMarkdown. 
 
