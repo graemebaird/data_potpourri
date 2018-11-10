@@ -1,0 +1,182 @@
+---
+title: "Test Report"
+author: "Your Name"
+date: "July 3, 2015"
+output:
+  word_document:
+    reference_docx: RM_to_word.docx
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Header 1
+
+This is a standby template for adjusting the automatic formatting of RMarkdown documents intended to produce scientific manuscripts. It will be iteratively updated as additional object-instances are observed for the manuscript pipeline. 
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+## Some LaTeX Basics
+
+In this section, we show you some rudiments of the LaTeX typesetting language.
+
+### Subscripts and Superscripts
+To indicate a subscript, use the underscore `_` character. To indicate a superscript, use a single caret character `^`.  Note: this can be confusing, because the R Markdown language delimits superscripts with two carets. In LaTeX equations, a single caret indicates the superscript. 
+
+If the subscript or superscript has just one character, there is no need to delimit with braces. However, if there is more than one character, braces must be used.  
+
+The following examples illustrate:
+
+```
+$$X_i$$
+$$X_{i}$$
+```
+
+$$X_i$$
+$$X_{i}$$
+
+Notice that in the above case, braces were not actually needed.
+
+In this next example, however, failure to use braces creates an error, as LaTeX sets only the first character as a subscript
+
+```
+$$X_{i,j}$$
+$$X_i,j$$
+```
+
+$$X_{i,j}$$
+$$X_i,j$$
+
+Here is an expression that uses both subscripts and superscripts
+
+```
+$$X^2_{i,j}$$
+```
+
+$$X^2_{i,j}$$
+
+### Square Roots
+
+We indicate a square root using the `\sqrt` operator.
+
+```
+$$\sqrt{b^2 - 4ac}$$
+```
+
+$$\sqrt{b^2 - 4ac}$$
+
+### Fractions
+
+Displayed fractions are typeset using the `\frac` operator.
+
+```
+$$\frac{4z^3}{16}$$
+```
+$$\frac{4z^3}{16}$$
+
+### Summation Expressions
+
+These are indicated with the `\sum' operator, followed by a subscript for the material appearing below the summation sign, and a superscript for any material appearing above the summation sign.
+
+Here is an example.
+
+```
+$$\sum_{i=1}^{n} X^3_i$$
+```
+$$\sum_{i=1}^{n} X^3_i$$
+
+
+### Self-Sizing Parentheses
+
+In LaTeX, you can create parentheses, brackets, and braces which size themselves automatically to contain large expressions. You do this using the `\left` and `\right` operators.  Here is an example
+
+```
+$$\sum_{i=1}^{n}\left( \frac{X_i}{Y_i} \right)$$
+```
+
+$$\sum_{i=1}^{n}\left( \frac{X_i}{Y_i} \right)$$
+
+### Greek Letters
+
+Many statistical expressions use Greek letters. Much of the Greek alphabet is implemented in LaTeX, as indicated in the LaTeX cheat sheet available at the course website.  There are both upper and lower case versions available for some letters.
+
+```
+$$\alpha, \beta,  \gamma, \Gamma$$
+```
+
+$$\alpha, \beta,  \gamma, \Gamma$$
+
+### Special Symbols
+
+All common mathematical symbols are implemented, and you can find a listing on the LaTeX cheat sheet.
+
+Some examples. (Notice that, in the third example, I use the tilde character for a forced space. Generally LaTeX does spacing for you automatically, and unless you use the tilde character, R will ignore your attempts to add spaces.)
+
+```
+$$a \pm b$$
+$$x \ge 15$$
+$$a_i \ge 0~~~\forall i$$
+```
+
+$$a \pm b$$
+$$x \ge 15$$
+$$a_i \ge 0~~~\forall i$$
+
+### Special Functions
+
+LaTeX typesets special functions in a different font from mathematical variables. These functions, such as $\sin$, $\cos$, etc. are indicated in LaTeX with a backslash. Here is an example that also illustrates how to typeset an integral.
+
+```
+$$\int_0^{2\pi} \sin x~dx$$
+```
+$$\int_0^{2\pi} \sin x~dx$$
+
+### Matrices
+
+Matrics are presented in the `array` environment. One begins with the statement
+`\begin{array}` and ends with the statement `\end{array}`. Following the opening statement, a format code is used to indicate the formatting of each column. In the example below, we use the code `{rrr}` to indicate that each column is right justified. Each row is then entered, with cells separated by the `&` symbol, and each line (except the last) terminated by `\\`.
+
+```
+$$\begin{array}
+{rrr}
+1 & 2 & 3 \\
+4 & 5 & 6 \\
+7 & 8 & 9
+\end{array}
+$$
+```
+$$\begin{array}
+{rrr}
+1 & 2 & 3 \\
+4 & 5 & 6 \\
+7 & 8 & 9
+\end{array}
+$$
+
+In math textbooks, matrices are often surrounded by brackets, and are assigned to a boldface letter.  Here is an example
+
+```
+$$\mathbf{X} = \left[\begin{array}
+{rrr}
+1 & 2 & 3 \\
+4 & 5 & 6 \\
+7 & 8 & 9
+\end{array}\right]
+$$
+```
+
+$$\mathbf{X} = \left[\begin{array}
+{rrr}
+1 & 2 & 3 \\
+4 & 5 & 6 \\
+7 & 8 & 9
+\end{array}\right]
+$$
