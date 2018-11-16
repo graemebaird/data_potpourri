@@ -1,7 +1,7 @@
 
 require(rstan)
 
-subsm = 1000
+subsm = 2000
 
 dl_tr = damagelag %>%
   mutate(plantB = total - plantG,
@@ -15,8 +15,12 @@ dl_tr = damagelag %>%
 
 dl_tr$N = subsm
 
-Y = dl_tr$plantB
+Y = dl_tr$total
 
-fit <- stan(file="Simple_missingness_linked.stan", data=dl_tr,
-            iter=400, warmup = 100, chains=1, cores=1)
+fit1 <- stan(file="Simple_missingness_linked.stan", data=dl_tr,
+            iter=1000, warmup = 200, chains=1, cores=1)
   
+
+fit2 <- stan(file="Simple_missingness.stan", data=dl_tr,
+            iter=1000, warmup = 200, chains=1, cores=1)
+

@@ -81,7 +81,7 @@ generated quantities{
     lambda[n] = a_l + bT_l*trtmnt[n] + bJ_l*jday[n] + bJs_l*jday[n]*jday[n] + bL_l*lygus_N[n]; 
     lambda[n] = exp(lambda[n]);
 
-    lambda_total[n] = a_l + bT_l*trtmnt[n] + bJ_l*jday[n] + bJs_l*jday[n]*jday[n] + bL_l*lygus_N[n]; 
-    lambda_total[n] = exp(lambda[n]);
+    lambda_total[n] = a_lt + bT_lt*trtmnt[n] + bJ_lt*jday[n] + bJs_lt*jday[n]*jday[n] + bL_lt*lygus_N[n]; 
+    lambda_total[n] = exp(lambda_total[n]);
   }
 }
