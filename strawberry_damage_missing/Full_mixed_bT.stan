@@ -23,10 +23,17 @@ parameters{
 }
 
 model{
+  # Parameters to be estimated
   vector[N] pbar;
   vector[N] lambda;
+
+  # Log-probability storage variable for marginal summing of integer variable
   real lp[51];
+
+  # Prior for beta-binomial
   theta ~ exponential( 1 );
+
+  # Note regularizing priors on regressions coefficients
   a_l ~ normal (0,1);
   a_p ~ normal (0,1);
   bT_l ~ normal (0,1);
@@ -38,6 +45,8 @@ model{
   bL_l ~ normal(0,1);
   bL_p ~ normal(0,1);
   
+  # This model block estimates parallel regressions on pbar, the proportion parameter for the beta-binomial model, and lambda, the mean-variance parameter for the poisson model. A thorough implementation would include evaluation of appropriate regression forms.
+
   for (n in 1:N){
     pbar[n] = a_p + bT_p*trtmnt[n] + bR_p*trtmnt[n]*exp(-row2[n]) + bJ_p*jday[n] + bL_p*lygus_N[n];
     pbar[n] = inv_logit(pbar[n]);
@@ -52,4 +61,7 @@ model{
 }
 
 generated quantities{
+
+  # Empty here but in a practical model would contain generated posterior predictive checks and any predictive quantities desired
+
 }
